@@ -1,5 +1,7 @@
+
+
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import Sidebar from "../Layout/Sidebar/Sidebar";
 import Navbar from "../Layout/Navbar/Navbar";
@@ -26,9 +28,6 @@ import GymAdvertisement from "../Admin/Advertisement/Advertisement";
 export default function Home() {
   const [currentView, setCurrentView] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const closeSidebar = () => setIsSidebarOpen(false);
-  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   const user = { name: "Admin", role: "admin" };
 
@@ -75,10 +74,18 @@ export default function Home() {
 
   return (
     <div className="flex h-screen overflow-hidden relative">
-      {/* Floating Ad */}
-      <div className="absolute top-[200px] left-1/2 -translate-x-1/2 z-50">
+      {/* Floating Ad (desktop center, mobile bottom) */}
+      <div className="fixed md:absolute bottom-4 md:top-[200px] left-1/2 -translate-x-1/2 z-50">
         <GymAdvertisement />
       </div>
+
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+        />
+      )}
 
       {/* Sidebar */}
       <Sidebar
@@ -86,23 +93,19 @@ export default function Home() {
         setCurrentView={setCurrentView}
         user={user}
         isSidebarOpen={isSidebarOpen}
-        closeSidebar={closeSidebar}
+        closeSidebar={() => setIsSidebarOpen(false)}
       />
 
       {/* Main Content */}
-      <div
-        className={`flex-1 flex flex-col overflow-hidden w-full transition-all duration-300 ${
-          isSidebarOpen ? "ml-64" : "ml-0"
-        }`}
-      >
+      <div className="flex-1 flex flex-col w-full">
         <Navbar
           user={user}
           setCurrentView={setCurrentView}
-          toggleSidebar={toggleSidebar}
+          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
 
-        {/* Page Render */}
-        <main className="flex-1 md:ml-[260px] overflow-y-auto bg-gray-100">
+        {/* Page */}
+        <main className="flex-1 overflow-y-auto bg-gray-100 md:ml-[260px] p-3 md:p-6">
           {renderPage()}
         </main>
       </div>
